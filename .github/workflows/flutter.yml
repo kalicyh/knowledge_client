@@ -95,10 +95,6 @@ jobs:
         shell: pwsh
         run: flutter build windows
 
-      - name: 打包Linux
-        if: ${{ matrix.type == 'linux' }}
-        run: flutter build linux
-
       - name: 打包安卓
         if: ${{ matrix.type == 'android' }}
         run: flutter build apk
@@ -129,11 +125,32 @@ jobs:
         run: |
           Compress-Archive -Path '${{ matrix.path }}\${{ matrix.output }}' -DestinationPath '${{ github.event.repository.name }}-${{ matrix.type }}.zip'
 
-      - name: Release
+      - name: Release(windows)
+        if: ${{ matrix.type == 'windows' }}
         uses: ncipollo/release-action@v1
         with:
           tag: "v${{ env.version }}"
           draft: false
-          artifacts: "*.dmg,*.zip,build/app/outputs/flutter-apk/*.apk"
+          artifacts: "*.zip"
+          allowUpdates: true
+          token: ${{ secrets.TOKEN }}
+
+      - name: Release(android)
+        if: ${{ matrix.type == 'android' }}
+        uses: ncipollo/release-action@v1
+        with:
+          tag: "v${{ env.version }}"
+          draft: false
+          artifacts: "build/app/outputs/flutter-apk/*.apk"
+          allowUpdates: true
+          token: ${{ secrets.TOKEN }}
+
+      - name: Release(macos)
+        if: ${{ matrix.type == 'macos' }}
+        uses: ncipollo/release-action@v1
+        with:
+          tag: "v${{ env.version }}"
+          draft: false
+          artifacts: "*.dmg"
           allowUpdates: true
           token: ${{ secrets.TOKEN }}
