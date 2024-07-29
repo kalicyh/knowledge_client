@@ -19,13 +19,8 @@ jobs:
 
     strategy:
       matrix:
-        type: [ web, macos, windows, linux, android ]
+        type: [ macos, windows, linux, android ]
         include:
-          - type: web
-            os: macos-latest
-            path: build
-            output: web
-
           - type: macos
             os: macos-latest
             path: build/macos/Build/Products/Release
@@ -90,19 +85,6 @@ jobs:
       - name: 打印版本号
         run: |
           echo "version: ${{ env.version }}"
-
-      - name: 打包WEB
-        if: ${{ matrix.type == 'web' }}
-        run: flutter build web --release --base-href "/${{ github.event.repository.name }}/"
-
-      - name: 将web部署到Github Page
-        uses: JamesIves/github-pages-deploy-action@v4
-        if: ${{ matrix.type == 'web' }}
-        with:
-          token: ${{ secrets.TOKEN }}
-          branch: gh-pages
-          folder: build/web
-          clean: true
 
       - name: 打包Macos
         if: ${{ matrix.type == 'macos' }}
