@@ -90,16 +90,6 @@ jobs:
         if: ${{ matrix.type == 'macos' }}
         run: flutter build macos
 
-      - name: 安装 create-dmg
-        if: ${{ matrix.type == 'macos' }}
-        run: |
-          brew install create-dmg
-
-      - name: 创建 DMG
-        if: ${{ matrix.type == 'macos' }}
-        run: |
-          create-dmg ${{ matrix.path }}/${{ matrix.output }}
-
       - name: 打包Windows
         if: ${{ matrix.type == 'windows' }}
         shell: pwsh
