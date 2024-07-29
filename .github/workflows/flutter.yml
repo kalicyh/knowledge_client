@@ -90,6 +90,16 @@ jobs:
         if: ${{ matrix.type == 'macos' }}
         run: flutter build macos
 
+      - name: 安装 create-dmg
+        if: ${{ matrix.type == 'macos' }}
+        run: |
+          brew install create-dmg
+
+      - name: 创建 DMG
+        if: ${{ matrix.type == 'macos' }}
+        run: |
+          create-dmg ${{ matrix.path }}/${{ matrix.output }}
+
       - name: 打包Windows
         if: ${{ matrix.type == 'windows' }}
         shell: pwsh
@@ -108,11 +118,10 @@ jobs:
           KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
 
-
-      - name: 压缩产物
-        if: ${{ matrix.type != 'windows' && matrix.type != 'android' }}
+      - name: 压缩产物(macos)
+        if: ${{ matrix.type == 'macos' }}
         run: |
-          tar -czvf ${{ github.event.repository.name }}-${{ matrix.type }}.tar.gz -C ${{ matrix.path }} ${{ matrix.output }}
+          zip -r ${{ github.event.repository.name }}-${{ matrix.type }}.dmg ${{ matrix.path }}/{{ github.event.repository.name }}.app
 
       - name: 压缩产物(windows)
         if: ${{ matrix.type == 'windows' }}
@@ -125,6 +134,6 @@ jobs:
         with:
           tag: "v${{ env.version }}"
           draft: false
-          artifacts: "*.tar.gz,*.zip,build/app/outputs/flutter-apk/*.apk"
+          artifacts: "*.dmg,*.zip,build/app/outputs/flutter-apk/*.apk"
           allowUpdates: true
           token: ${{ secrets.TOKEN }}
