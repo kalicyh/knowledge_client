@@ -116,7 +116,12 @@ jobs:
       - name: 压缩产物(macos)
         if: ${{ matrix.type == 'macos' }}
         run: |
-          create-dmg ${{ github.event.repository.name }}-${{ matrix.type }}.dmg "${{ matrix.path }}/${{ github.event.repository.name }}.app"
+          create-dmg \
+            --window-pos 200 120 \
+            --window-size 800 400 \
+            --app-drop-link 600 185 \
+            ${{ github.event.repository.name }}-${{ matrix.type }}.dmg \
+            "${{ matrix.path }}/${{ github.event.repository.name }}.app"
 
       - name: 压缩产物(windows)
         if: ${{ matrix.type == 'windows' }}
