@@ -116,7 +116,7 @@ jobs:
       - name: 压缩产物(macos)
         if: ${{ matrix.type == 'macos' }}
         run: |
-          create-dmg "${{ matrix.path }}/${{ github.event.repository.name }}.app" ${{ github.event.repository.name }}-${{ matrix.type }}.dmg
+          create-dmg ${{ github.event.repository.name }}-${{ matrix.type }}.dmg "${{ matrix.path }}/${{ github.event.repository.name }}.app"
 
       - name: 压缩产物(windows)
         if: ${{ matrix.type == 'windows' }}
