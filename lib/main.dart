@@ -66,8 +66,14 @@ class _HomePageState extends State<HomePage> {
             width: 250,
             child: Column(
               children: [
-                ElevatedButton(onPressed: () {}, child: Text('话术')),
-                ElevatedButton(onPressed: () {}, child: Text('朋友圈')),
+                // Buttons in a Row
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(onPressed: () {}, child: Text('话术')),
+                    ElevatedButton(onPressed: () {}, child: Text('朋友圈')),
+                  ],
+                ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextField(
