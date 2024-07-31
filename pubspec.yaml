@@ -29,6 +29,8 @@ dependencies:
   # 以下添加了 Cupertino Icons 字体到你的应用程序中。
   # 与 CupertinoIcons 类一起使用以实现 iOS 风格的图标。
   cupertino_icons: ^1.0.6
+  sqflite: ^2.0.0+4
+  path: ^1.8.0
 
 dev_dependencies:
   flutter_test:
