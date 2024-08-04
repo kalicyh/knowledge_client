@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'database_helper.dart';
+import 'api_service.dart'; // 导入 ApiService
 
 void main() {
   runApp(MyApp());
@@ -9,7 +10,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter App',
+      title: '果之都智库',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -26,6 +27,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final DatabaseHelper _dbHelper = DatabaseHelper();
+  final ApiService _apiService = ApiService(baseUrl: 'https://zk.jiuyue1688.vip');
   List<String> _categories = [];
 
   @override
@@ -41,9 +43,67 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void _addCategory(String name) async {
-    await _dbHelper.insertCategory(name);
-    _loadCategories();
+  Future<void> _updateData() async {
+    try {
+      final infoData = await _apiService.fetchInfo();
+      final List<String> categories = List<String>.from(infoData['name_categories']);
+
+      // Clear existing categories and insert new ones
+      await _dbHelper.deleteAllCategories(); // Clear all categories
+      for (var category in categories) {
+        await _dbHelper.insertCategory(category);
+      }
+
+      // Update categories list and show success dialog
+      setState(() {
+        _categories = categories;
+      });
+      _showUpdateDialog(message: '数据已更新');
+    } catch (e) {
+      _showUpdateDialog(message: '更新失败，请检查网络连接');
+    }
+  }
+
+  Future<void> _updateRecords() async {
+    try {
+      final data = await _apiService.fetchData();
+      final List<Map<String, dynamic>> records = List<Map<String, dynamic>>.from(data['records']);
+
+      // Clear existing records and insert new ones
+      await _dbHelper.deleteAllRecords(); // Clear all records
+      for (var record in records) {
+        await _dbHelper.insertRecord(
+          record['序号'],
+          record['名字'],
+          record['分类'],
+          record['文案']
+        );
+      }
+
+      _showUpdateDialog(message: '记录已更新');
+    } catch (e) {
+      _showUpdateDialog(message: '更新记录失败，请检查网络连接');
+    }
+  }
+
+  void _showUpdateDialog({required String message}) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('更新提示'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text('确定'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -55,7 +115,8 @@ class _HomePageState extends State<HomePage> {
           IconButton(
             icon: Icon(Icons.refresh),
             onPressed: () {
-              // Update data from API
+              _updateData();
+              _updateRecords();
             },
           ),
         ],
@@ -66,7 +127,6 @@ class _HomePageState extends State<HomePage> {
             width: 250,
             child: Column(
               children: [
-                // Buttons in a Row
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
