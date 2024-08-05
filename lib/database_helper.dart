@@ -54,12 +54,11 @@ class DatabaseHelper {
     );
   }
 
-  Future<void> insertRecord(int serialNumber, String name, String category, String description) async {
+  Future<void> insertRecord(String name, String category, String description) async {
     final db = await database;
     await db.insert(
       'records',
       {
-        'serial_number': serialNumber,
         'name': name,
         'category': category,
         'description': description,
@@ -81,6 +80,42 @@ class DatabaseHelper {
     final List<Map<String, dynamic>> maps = await db.query('records');
     return maps;
   }
+
+  Future<List<Map<String, dynamic>>> getFilteredRecords({
+    String? filterValue1,
+    String? filterValue2,
+  }) async {
+    final db = await database;
+
+    // 创建筛选条件和参数列表
+    List<String> whereClauses = [];
+    List<dynamic> whereArgs = [];
+
+    // 如果提供了筛选值1且不为"全部"，则添加模糊匹配条件
+    if (filterValue1 != null && filterValue1.isNotEmpty) {
+      whereClauses.add('category LIKE ?');
+      whereArgs.add('%$filterValue1%');
+    }
+
+    // 如果提供了筛选值2，则添加模糊匹配条件
+    if (filterValue2 != null && filterValue2.isNotEmpty) {
+      whereClauses.add('name LIKE ?');
+      whereArgs.add('%$filterValue2%');
+    }
+
+    // 将筛选条件用 'AND' 连接
+    String whereStatement = whereClauses.isNotEmpty ? whereClauses.join(' AND ') : '';
+
+    // 查询数据库
+    final List<Map<String, dynamic>> maps = await db.query(
+      'records',
+      where: whereStatement.isNotEmpty ? whereStatement : null,
+      whereArgs: whereArgs.isNotEmpty ? whereArgs : null,
+    );
+
+    return maps;
+  }
+
 
   Future<void> deleteCategory(int id) async {
     final db = await database;

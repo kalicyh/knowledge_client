@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'database_helper.dart';
 import 'api_service.dart'; // 导入 ApiService
 
@@ -29,17 +30,38 @@ class _HomePageState extends State<HomePage> {
   final DatabaseHelper _dbHelper = DatabaseHelper();
   final ApiService _apiService = ApiService(baseUrl: 'https://zk.jiuyue1688.vip');
   List<String> _categories = [];
+  List<Map<String, dynamic>> _records = [];
+  String _selectedMonth = '月';
+  String _category = '';
 
   @override
   void initState() {
     super.initState();
     _loadCategories();
+    _loadRecords();
   }
 
   Future<void> _loadCategories() async {
     final categories = await _dbHelper.getCategories();
     setState(() {
       _categories = categories;
+    });
+  }
+
+  Future<void> _loadRecords() async {
+    final records = await _dbHelper.getRecords();
+    setState(() {
+      _records = records;
+    });
+  }
+
+  Future<void> _loadFilteredRecords(String filterValue1, String filterValue2) async {
+    final filteredRecords = await _dbHelper.getFilteredRecords(
+      filterValue1: filterValue1,
+      filterValue2: filterValue2,
+    );
+    setState(() {
+      _records = filteredRecords;
     });
   }
 
@@ -73,14 +95,15 @@ class _HomePageState extends State<HomePage> {
       await _dbHelper.deleteAllRecords(); // Clear all records
       for (var record in records) {
         await _dbHelper.insertRecord(
-          record['序号'],
           record['名字'],
           record['分类'],
           record['文案']
         );
       }
-
-      _showUpdateDialog(message: '记录已更新');
+      final recordss = await _dbHelper.getRecords();
+      setState(() {
+        _records = recordss;
+      });
     } catch (e) {
       _showUpdateDialog(message: '更新记录失败，请检查网络连接');
     }
@@ -144,21 +167,57 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 Wrap(
-                  children: List.generate(12, (index) {
-                    return ElevatedButton(
-                      onPressed: () {},
-                      child: Text('${index + 1}月'),
-                    );
-                  }),
+                  spacing: 8.0, // 按钮之间的水平间距
+                  runSpacing: 4.0, // 按钮之间的垂直间距
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                          setState(() {
+                            _selectedMonth = "";
+                          });
+                          _loadFilteredRecords(_selectedMonth, _category);
+                        },
+                      child: Text('全部'),
+                    ),
+                    ...List.generate(12, (index) {
+                      final month = '${index + 1}月';
+                      return ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            _selectedMonth = month; // 更新所选的月份
+                          });
+                          _loadFilteredRecords(month, _category);
+                        },
+                        child: Text(month),
+                      );
+                    }),
+                  ],
                 ),
                 Expanded(
                   child: ListView(
-                    children: _categories.map((category) {
-                      return ElevatedButton(
-                        onPressed: () {},
-                        child: Text(category),
+                    children: [ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            _category = ''; // 清空类别以显示所有记录
+                          });
+                          _loadFilteredRecords(_selectedMonth, _category);
+                        },
+                        child: Text('全部'),
+                      ),
+                      ..._categories.map((category) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4.0), // 添加垂直间距
+                        child: ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              _category = category;
+                            });
+                            _loadFilteredRecords(_selectedMonth, category);
+                          },
+                          child: Text(category),
+                        ),
                       );
-                    }).toList(),
+                    }).toList(),],
                   ),
                 ),
               ],
@@ -166,13 +225,23 @@ class _HomePageState extends State<HomePage> {
           ),
           Expanded(
             child: ListView(
-              children: List.generate(10, (index) {
+              children: List.generate(_records.length, (index) {
+                final record = _records[index]; // 获取记录
+                final description = record['description'] ?? 'no description'; // 访问记录中的字段，假设字段名为 'name'
+
                 return ListTile(
-                  title: Text('Record $index'),
+                  title: Text(description), // 显示记录的名称
                   onTap: () {
-                    // Copy content to clipboard
+                    // 将内容复制到剪贴板
+                    Clipboard.setData(ClipboardData(text: description));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('成功复制到剪贴板: $description'),
+                        duration: Duration(milliseconds: 280),
+                      ),
+                    );
                   },
-                  trailing: Text('😊'), // Emoji example
+                  // trailing: Text('😊'),
                 );
               }),
             ),
