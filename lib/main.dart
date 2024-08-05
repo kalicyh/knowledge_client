@@ -1,9 +1,17 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'database_helper.dart';
 import 'api_service.dart'; // 导入 ApiService
 
 void main() {
+  // Platform-specific initialization
+  if (Platform.isWindows || Platform.isLinux) {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+  }
+
   runApp(MyApp());
 }
 
@@ -172,11 +180,11 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                          setState(() {
-                            _selectedMonth = "";
-                          });
-                          _loadFilteredRecords(_selectedMonth, _category);
-                        },
+                        setState(() {
+                          _selectedMonth = "";
+                        });
+                        _loadFilteredRecords(_selectedMonth, _category);
+                      },
                       child: Text('全部'),
                     ),
                     ...List.generate(12, (index) {
@@ -195,7 +203,8 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Expanded(
                   child: ListView(
-                    children: [ElevatedButton(
+                    children: [
+                      ElevatedButton(
                         onPressed: () {
                           setState(() {
                             _category = ''; // 清空类别以显示所有记录
@@ -205,19 +214,20 @@ class _HomePageState extends State<HomePage> {
                         child: Text('全部'),
                       ),
                       ..._categories.map((category) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4.0), // 添加垂直间距
-                        child: ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              _category = category;
-                            });
-                            _loadFilteredRecords(_selectedMonth, category);
-                          },
-                          child: Text(category),
-                        ),
-                      );
-                    }).toList(),],
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4.0), // 添加垂直间距
+                          child: ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                _category = category;
+                              });
+                              _loadFilteredRecords(_selectedMonth, category);
+                            },
+                            child: Text(category),
+                          ),
+                        );
+                      }).toList(),
+                    ],
                   ),
                 ),
               ],
