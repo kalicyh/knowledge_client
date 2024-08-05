@@ -104,7 +104,7 @@ jobs:
           create-dmg \
             --window-pos 200 120 \
             --window-size 800 400 \
-            --app-drop-link 600 185 \
+            --app-drop-link 600 35 \
             ${{ github.event.repository.name }}-${{ matrix.type }}.dmg \
             "${{ matrix.path }}/${{ github.event.repository.name }}.app"
 
