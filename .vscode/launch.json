@@ -5,18 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "knowledge_client",
+            "name": "knowledge_stock",
             "request": "launch",
             "type": "dart"
         },
         {
-            "name": "knowledge_client (profile mode)",
+            "name": "knowledge_stock (profile mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "profile"
         },
         {
-            "name": "knowledge_client (release mode)",
+            "name": "knowledge_stock (release mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"
