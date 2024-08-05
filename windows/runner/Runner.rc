@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "果之都智库" "\0"
+            VALUE "FileDescription", "knowledge_stock" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "果之都智库" "\0"
+            VALUE "InternalName", "knowledge_stock" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2024 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "果之都智库.exe" "\0"
-            VALUE "ProductName", "果之都智库" "\0"
+            VALUE "OriginalFilename", "knowledge_stock.exe" "\0"
+            VALUE "ProductName", "knowledge_stock" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

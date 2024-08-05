@@ -1,6 +1,6 @@
 {
-    "name": "果之都智库",
-    "short_name": "果之都智库",
+    "name": "knowledge_stock",
+    "short_name": "knowledge_stock",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
