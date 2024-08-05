@@ -1,4 +1,4 @@
-package com.example.knowledge_stock
+package com.example.knowledge_client
 
 import io.flutter.embedding.android.FlutterActivity
 

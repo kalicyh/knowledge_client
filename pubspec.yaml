@@ -1,4 +1,4 @@
-name: knowledge_stock
+name: knowledge_client
 description: "知识库前端，基于flutter。"
 # 以下一行可以防止包被意外发布到 pub.dev 上使用 `flutter pub publish`。这对于私有包是首选。
 publish_to: 'none' # 如果你希望发布到 pub.dev，请移除这一行
