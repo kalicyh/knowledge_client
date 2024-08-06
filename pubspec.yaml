@@ -13,10 +13,11 @@ publish_to: 'none' # 如果你希望发布到 pub.dev，请移除这一行
 # 更多关于 iOS 版本的信息，请访问
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # 在 Windows 中，build-name 用作产品和文件版本的主要、次要和补丁部分，而 build-number 用作构建后缀。
-version: 1.2.0
+version: 1.2.1
 
 environment:
   sdk: '>=3.4.4 <4.0.0'
+  flutter: ">=3.22.3"
 
 # 依赖项指定了你的包需要工作的其他包。
 # 要自动升级你的包依赖到最新版本，请考虑运行 `flutter pub upgrade --major-versions`。
@@ -41,7 +42,7 @@ dev_dependencies:
   # 下面的 "flutter_lints" 包包含了一组推荐的 lints 以鼓励良好的编码实践。
   # 该包提供的 lints 集在位于包根目录的 `analysis_options.yaml` 文件中激活。
   # 有关禁用特定 lint 规则和激活其他规则的信息，请参见该文件。
-  flutter_lints: ^3.0.0
+  flutter_lints: ^4.0.0
   build_runner: ^2.1.7
 
 # 有关此文件的通用 Dart 部分的信息，请参见以下页面：https://dart.dev/tools/pub/pubspec
