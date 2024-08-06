@@ -1,17 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'database_helper.dart';
-import 'api_service.dart'; // 导入 ApiService
+import 'api_service.dart';
 
 void main() {
-  // Platform-specific initialization
-  if (Platform.isWindows || Platform.isLinux) {
-    sqfliteFfiInit();
-    databaseFactory = databaseFactoryFfi;
-  }
-
   runApp(MyApp());
 }
 
@@ -35,8 +27,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final DatabaseHelper _dbHelper = DatabaseHelper();
-  final ApiService _apiService = ApiService(baseUrl: 'https://zk.jiuyue1688.vip');
+  final ApiService _apiService = ApiService(baseUrl: 'https://zk.jiuyue1688.vip/talking_points');
   List<String> _categories = [];
   List<Map<String, dynamic>> _records = [];
   String _selectedMonth = '月';
@@ -45,44 +36,29 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _loadCategories();
-    _loadRecords();
   }
 
-  Future<void> _loadCategories() async {
-    final categories = await _dbHelper.getCategories();
-    setState(() {
-      _categories = categories;
-    });
-  }
-
-  Future<void> _loadRecords() async {
-    final records = await _dbHelper.getRecords();
-    setState(() {
-      _records = records;
-    });
-  }
-
+// 筛选语料数据
   Future<void> _loadFilteredRecords(String filterValue1, String filterValue2) async {
-    final filteredRecords = await _dbHelper.getFilteredRecords(
-      filterValue1: filterValue1,
-      filterValue2: filterValue2,
-    );
+    // final filteredRecords = await _dbHelper.getFilteredRecords(
+    //   filterValue1: filterValue1,
+    //   filterValue2: filterValue2,
+    // );
     setState(() {
-      _records = filteredRecords;
+      // _records = filteredRecords;
     });
   }
-
+// 获取分类数据
   Future<void> _updateData() async {
     try {
       final infoData = await _apiService.fetchInfo();
       final List<String> categories = List<String>.from(infoData['name_categories']);
 
       // Clear existing categories and insert new ones
-      await _dbHelper.deleteAllCategories(); // Clear all categories
-      for (var category in categories) {
-        await _dbHelper.insertCategory(category);
-      }
+      // await _dbHelper.deleteAllCategories(); // Clear all categories
+      // for (var category in categories) {
+      //   await _dbHelper.insertCategory(category);
+      // }
 
       // Update categories list and show success dialog
       setState(() {
@@ -93,29 +69,20 @@ class _HomePageState extends State<HomePage> {
       _showUpdateDialog(message: '更新失败，请检查网络连接');
     }
   }
-
+// 获取语料数据
   Future<void> _updateRecords() async {
     try {
       final data = await _apiService.fetchData();
       final List<Map<String, dynamic>> records = List<Map<String, dynamic>>.from(data['records']);
 
-      // Clear existing records and insert new ones
-      await _dbHelper.deleteAllRecords(); // Clear all records
-      for (var record in records) {
-        await _dbHelper.insertRecord(
-          record['名字'],
-          record['分类'],
-          record['文案']
-        );
-      }
-      final recordss = await _dbHelper.getRecords();
       setState(() {
-        _records = recordss;
+        _records = records;
       });
     } catch (e) {
       _showUpdateDialog(message: '更新记录失败，请检查网络连接');
     }
   }
+
 
   void _showUpdateDialog({required String message}) {
     showDialog(
@@ -237,7 +204,7 @@ class _HomePageState extends State<HomePage> {
             child: ListView(
               children: List.generate(_records.length, (index) {
                 final record = _records[index]; // 获取记录
-                final description = record['description'] ?? 'no description'; // 访问记录中的字段，假设字段名为 'name'
+                final description = record['文案'] ?? 'no description'; // 访问记录中的字段，假设字段名为 'name'
 
                 return ListTile(
                   title: Text(description), // 显示记录的名称
