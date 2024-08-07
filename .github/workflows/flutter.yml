@@ -74,6 +74,13 @@ jobs:
       - name: 打印版本号
         run: |
           echo "version: ${{ env.version }}"
+      
+      - name: Install CocoaPods
+        if: ${{ matrix.type == 'macos' }}
+        run: |
+          cd macos
+          pod install
+          cd ..
 
       - name: 打包Macos
         if: ${{ matrix.type == 'macos' }}
