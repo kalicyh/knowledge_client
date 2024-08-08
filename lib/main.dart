@@ -29,56 +29,51 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final ApiService _apiService = ApiService(baseUrl: 'https://zk.jiuyue1688.vip/talking_points');
   List<String> _categories = [];
-  List<Map<String, dynamic>> _records = [];
+  List<String> _months = [];
+  List<String> _records = [];
   String _selectedMonth = '';
-  String _category = '';
-  String _name = '';
+  String _selectedcategory = '';
+  String _selectedname = '';
 
   @override
   void initState() {
     super.initState();
-    _updateData();
   }
 
-  // 筛选语料数据
   Future<void> _loadFilteredRecords() async {
-    final data = await _apiService.fetchCategories(
-        category: _category.isNotEmpty ? _category : null,
-        month: _selectedMonth.isNotEmpty ? _selectedMonth : null,
-        name: _name.isNotEmpty ? _name : null,
+  try {
+    final response = await _apiService.fetchCategories(
+        category: _selectedcategory.isNotEmpty ? _selectedcategory : "",
+        month: _selectedMonth.isNotEmpty ? _selectedMonth : "",
+        name: _selectedname.isNotEmpty ? _selectedname : "",
     );
-    final List<String> categories = List<String>.from(data['name_categories']);
-    final List<Map<String, dynamic>> records = List<Map<String, dynamic>>.from(data['records']);
-    setState(() {
+
+    final data = response;
+
+    if (data.containsKey('months')) {
+      final List<String> months = List<String>.from(data['months']);
+      setState(() {
+      _months = months;
+    });
+    }
+
+    if (data.containsKey('names')) {
+      final List<String> categories = List<String>.from(data['names']);
+      setState(() {
       _categories = categories;
+    });
+    }
+
+    if (data.containsKey('texts')) {
+      final List<String> records = List<String>.from(data['texts']);
+      setState(() {
       _records = records;
     });
-  }
-  // 获取数据
-  Future<void> _updateData() async {
-    try {
-      // 更新产品种类数据
-      final infoData = await _apiService.fetchInfo();
-      final List<String> categories = List<String>.from(infoData['name_categories']);
-      setState(() {
-        _categories = categories;
-      });
-
-      // 更新语料数据
-      final data = await _apiService.fetchData();
-      final List<Map<String, dynamic>> records = List<Map<String, dynamic>>.from(data['records']);
-      setState(() {
-        _records = records;
-      });
-
-      // 数据更新成功的提示
-      _showUpdateDialog(message: '数据已更新');
-    } catch (e) {
-      // 更新失败的提示
-      _showUpdateDialog(message: '更新失败，请检查网络连接');
     }
+  } catch (e) {
+    print('Error: $e');
   }
-
+}
 
   void _showUpdateDialog({required String message}) {
     showDialog(
@@ -109,7 +104,7 @@ class _HomePageState extends State<HomePage> {
           IconButton(
             icon: Icon(Icons.refresh),
             onPressed: () {
-              _updateData();
+
             },
           ),
         ],
@@ -123,8 +118,22 @@ class _HomePageState extends State<HomePage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    ElevatedButton(onPressed: () {}, child: Text('话术')),
-                    ElevatedButton(onPressed: () {}, child: Text('朋友圈')),
+                    ElevatedButton(onPressed: () {
+                      setState(() {
+                          _selectedcategory = "朋友圈";
+                          _selectedMonth = "";
+                          _selectedname = '';
+                        });
+                        _loadFilteredRecords();
+                    }, child: Text('朋友圈')),
+                    ElevatedButton(onPressed: () {
+                      setState(() {
+                          _selectedcategory = "话术";
+                          _selectedMonth = "";
+                          _selectedname = '';
+                        });
+                        _loadFilteredRecords();
+                    }, child: Text('话术')),
                   ],
                 ),
                 Padding(
@@ -137,24 +146,26 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 Wrap(
-                  spacing: 8.0, // 按钮之间的水平间距
-                  runSpacing: 4.0, // 按钮之间的垂直间距
+                  spacing: 8.0,
+                  runSpacing: 4.0,
                   children: [
                     ElevatedButton(
                       onPressed: () {
                         setState(() {
-                          _selectedMonth = "";
+                          _selectedMonth = "月";
+                          // _selectedname = '';
                         });
                         _loadFilteredRecords();
                       },
                       child: Text('全部'),
                     ),
-                    ...List.generate(12, (index) {
-                      final month = '${index + 1}月';
+                    ...List.generate(_months.length, (index) {
+                      final month = _months[index];
                       return ElevatedButton(
                         onPressed: () {
                           setState(() {
-                            _selectedMonth = month; // 更新所选的月份
+                            _selectedMonth = month;
+                            // _selectedname = '';
                           });
                           _loadFilteredRecords();
                         },
@@ -169,23 +180,23 @@ class _HomePageState extends State<HomePage> {
                       ElevatedButton(
                         onPressed: () {
                           setState(() {
-                            _category = ''; // 清空类别以显示所有记录
+                            _selectedname = '';
                           });
                           _loadFilteredRecords();
                         },
                         child: Text('全部'),
                       ),
-                      ..._categories.map((category) {
+                      ..._categories.map((name) {
                         return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4.0), // 添加垂直间距
+                          padding: const EdgeInsets.symmetric(vertical: 4.0),
                           child: ElevatedButton(
                             onPressed: () {
                               setState(() {
-                                _category = category;
+                                _selectedname = name;
                               });
                               _loadFilteredRecords();
                             },
-                            child: Text(category),
+                            child: Text(name),
                           ),
                         );
                       }).toList(),
@@ -198,17 +209,14 @@ class _HomePageState extends State<HomePage> {
           Expanded(
             child: ListView(
               children: List.generate(_records.length, (index) {
-                final record = _records[index]; // 获取记录
-                final description = record['文案'] ?? 'no description'; // 访问记录中的字段，假设字段名为 'name'
-
+                final record = _records[index];
                 return ListTile(
-                  title: Text(description), // 显示记录的名称
+                  title: Text(record),
                   onTap: () {
-                    // 将内容复制到剪贴板
-                    Clipboard.setData(ClipboardData(text: description));
+                    Clipboard.setData(ClipboardData(text: record));
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('成功复制到剪贴板: $description'),
+                        content: Text('成功复制到剪贴板: $record'),
                         duration: Duration(milliseconds: 280),
                       ),
                     );

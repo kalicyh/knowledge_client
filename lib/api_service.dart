@@ -50,23 +50,31 @@ class ApiService {
     String? month,
     String? name,
   }) async {
-    // Build query parameters
-    final queryParameters = <String, String>{};
-    if (category != null && category.isNotEmpty) queryParameters['category'] = category;
-    if (month != null && month.isNotEmpty) queryParameters['month'] = month;
-    if (name != null && name.isNotEmpty) queryParameters['name'] = name;
-
-    final uri = Uri.parse('$baseUrl/filter').replace(queryParameters: queryParameters);
+    final uri = Uri.parse('$baseUrl/filter');
+    print(uri);
     
+    // Build the request body
+    final requestBody = jsonEncode({
+      'category': category,
+      'month': month,
+      'name': name,
+    });
+
     try {
-      final response = await http.get(uri).timeout(const Duration(seconds: 10));
+      final response = await http.post(
+        uri,
+        headers: {
+          'Content-Type': 'application/json', // Set the content type to JSON
+        },
+        body: requestBody,
+      ).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         // Ensure the response is UTF-8 encoded
         final decodedResponse = utf8.decode(response.bodyBytes);
         return jsonDecode(decodedResponse) as Map<String, dynamic>;
       } else {
-        throw Exception('Failed to load categories: ${response.statusCode}');
+        throw Exception('获取分类失败: ${response.statusCode}');
       }
     } catch (e) {
       // Print more detailed exception information
