@@ -27,18 +27,32 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final ApiService _apiService = ApiService(baseUrl: 'https://zk.jiuyue1688.vip/talking_points');
+  final ApiService _apiService = ApiService(baseUrl: 'https://zkk.jiuyue1688.vip/talking_points');
   List<String> _categories = [];
   List<String> _months = [];
   List<String> _records = [];
+  String _selectedcategory = '朋友圈';
   String _selectedMonth = '';
-  String _selectedcategory = '';
   String _selectedname = '';
 
   @override
   void initState() {
     super.initState();
+    _init();
   }
+
+  Future<void> _init() async {
+  try {
+    _loadFilteredRecords();
+    setState(() {
+      _selectedMonth = '月';
+    });
+    _loadFilteredRecords();
+  } catch (e) {
+    print('Error: $e');
+  }
+}
+
 
   Future<void> _loadFilteredRecords() async {
   try {
