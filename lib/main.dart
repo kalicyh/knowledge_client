@@ -30,56 +30,52 @@ class _HomePageState extends State<HomePage> {
   final ApiService _apiService = ApiService(baseUrl: 'https://zk.jiuyue1688.vip/talking_points');
   List<String> _categories = [];
   List<Map<String, dynamic>> _records = [];
-  String _selectedMonth = '月';
+  String _selectedMonth = '';
   String _category = '';
+  String _name = '';
 
   @override
   void initState() {
     super.initState();
+    _updateData();
   }
 
-// 筛选语料数据
-  Future<void> _loadFilteredRecords(String filterValue1, String filterValue2) async {
-    // final filteredRecords = await _dbHelper.getFilteredRecords(
-    //   filterValue1: filterValue1,
-    //   filterValue2: filterValue2,
-    // );
+  // 筛选语料数据
+  Future<void> _loadFilteredRecords() async {
+    final data = await _apiService.fetchCategories(
+        category: _category.isNotEmpty ? _category : null,
+        month: _selectedMonth.isNotEmpty ? _selectedMonth : null,
+        name: _name.isNotEmpty ? _name : null,
+    );
+    final List<String> categories = List<String>.from(data['name_categories']);
+    final List<Map<String, dynamic>> records = List<Map<String, dynamic>>.from(data['records']);
     setState(() {
-      // _records = filteredRecords;
+      _categories = categories;
+      _records = records;
     });
   }
-// 获取分类数据
+  // 获取数据
   Future<void> _updateData() async {
     try {
+      // 更新产品种类数据
       final infoData = await _apiService.fetchInfo();
       final List<String> categories = List<String>.from(infoData['name_categories']);
-
-      // Clear existing categories and insert new ones
-      // await _dbHelper.deleteAllCategories(); // Clear all categories
-      // for (var category in categories) {
-      //   await _dbHelper.insertCategory(category);
-      // }
-
-      // Update categories list and show success dialog
       setState(() {
         _categories = categories;
       });
-      _showUpdateDialog(message: '数据已更新');
-    } catch (e) {
-      _showUpdateDialog(message: '更新失败，请检查网络连接');
-    }
-  }
-// 获取语料数据
-  Future<void> _updateRecords() async {
-    try {
+
+      // 更新语料数据
       final data = await _apiService.fetchData();
       final List<Map<String, dynamic>> records = List<Map<String, dynamic>>.from(data['records']);
-
       setState(() {
         _records = records;
       });
+
+      // 数据更新成功的提示
+      _showUpdateDialog(message: '数据已更新');
     } catch (e) {
-      _showUpdateDialog(message: '更新记录失败，请检查网络连接');
+      // 更新失败的提示
+      _showUpdateDialog(message: '更新失败，请检查网络连接');
     }
   }
 
@@ -94,7 +90,7 @@ class _HomePageState extends State<HomePage> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop();
               },
               child: Text('确定'),
             ),
@@ -114,7 +110,6 @@ class _HomePageState extends State<HomePage> {
             icon: Icon(Icons.refresh),
             onPressed: () {
               _updateData();
-              _updateRecords();
             },
           ),
         ],
@@ -218,7 +213,6 @@ class _HomePageState extends State<HomePage> {
                       ),
                     );
                   },
-                  // trailing: Text('😊'),
                 );
               }),
             ),
