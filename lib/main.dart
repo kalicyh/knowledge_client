@@ -145,7 +145,7 @@ class _HomePageState extends State<HomePage> {
                         setState(() {
                           _selectedMonth = "";
                         });
-                        _loadFilteredRecords(_selectedMonth, _category);
+                        _loadFilteredRecords();
                       },
                       child: Text('全部'),
                     ),
@@ -156,7 +156,7 @@ class _HomePageState extends State<HomePage> {
                           setState(() {
                             _selectedMonth = month; // 更新所选的月份
                           });
-                          _loadFilteredRecords(month, _category);
+                          _loadFilteredRecords();
                         },
                         child: Text(month),
                       );
@@ -171,7 +171,7 @@ class _HomePageState extends State<HomePage> {
                           setState(() {
                             _category = ''; // 清空类别以显示所有记录
                           });
-                          _loadFilteredRecords(_selectedMonth, _category);
+                          _loadFilteredRecords();
                         },
                         child: Text('全部'),
                       ),
@@ -183,7 +183,7 @@ class _HomePageState extends State<HomePage> {
                               setState(() {
                                 _category = category;
                               });
-                              _loadFilteredRecords(_selectedMonth, category);
+                              _loadFilteredRecords();
                             },
                             child: Text(category),
                           ),
