@@ -2,12 +2,12 @@ name: Flutter 自动化打包
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v*.*.*'  # 只在以 v 开头的标签推送时触发，例如 v1.0.0
 
 # 并发策略
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   # 如果有新的运行实例，取消正在进行的实例
   cancel-in-progress: true
 
@@ -58,18 +58,9 @@ jobs:
       - name: 生成代码
         run: dart run build_runner build
 
-      - name: 获取版本号
-        if: ${{ matrix.type != 'windows' }}
+      - name: 提取版本号
         run: |
-          echo "version=$(awk -F': ' '/version:/ {gsub("\\+", "-", $2); print $2}' pubspec.yaml)" >> "$GITHUB_ENV"
-
-      - name: 获取版本号(windows)
-        if: ${{ matrix.type == 'windows' }}
-        shell: pwsh
-        run: |
-          $version = (Get-Content pubspec.yaml -Raw) -match 'version:\s*([^\s]+)' | Out-Null
-          $version = $Matches[1] -replace '\+', '-'
-          echo "version=$version" | Out-File -Append -Encoding utf8 -FilePath $Env:GITHUB_ENV
+          echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
       - name: 打印版本号
         run: |
