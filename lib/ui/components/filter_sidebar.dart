@@ -29,8 +29,8 @@ class FilterSidebar extends StatelessWidget {
         children: [
           //分类
           Wrap(
-            spacing: 8.0, // 按钮之间的水平间隔
-            runSpacing: 4.0, // 行间隔
+            spacing: 8.0,
+            runSpacing: 4.0,
             children: [
               ElevatedButton(
                 onPressed: () {

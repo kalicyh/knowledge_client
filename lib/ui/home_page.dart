@@ -9,10 +9,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final ApiService _apiService = ApiService(baseUrl: 'https://zkk.jiuyue1688.vip/talking_points');
+  final ApiService _apiService = ApiService(baseUrl: 'https://zk.jiuyue1688.vip');
   List<String> _categories = [];
   List<String> _months = [];
   List<String> _records = [];
+  String _versions = '';
   String _selectedCategory = '朋友圈';
   String _selectedMonth = '';
   String _selectedName = '';
@@ -74,19 +75,39 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void _showUpdateDialog({required String message}) {
+   Future<void> _getversion() async {
+    try {
+      final infoData = await _apiService.fetchInfo();
+      final String versions = infoData['version'];
+      print(versions);
+      setState(() {
+        _versions = versions;
+      });
+      _showDialog(
+        title: '关于',
+        message: '当前版本：1.5.0\n当前后端版本：$_versions',
+      );
+    } catch (e) {
+      _showDialog(
+        title: '软件版本',
+        message: '检查失败，请检查网络连接',
+      );
+    }
+  }
+
+  void _showDialog({required String title, required String message}) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('更新提示'),
+          title: Text(title),
           content: Text(message),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('确定'),
+              child: const Text('确定'),
             ),
           ],
         );
@@ -101,9 +122,18 @@ class _HomePageState extends State<HomePage> {
         title: Text('果之都智库'),
         actions: [
           IconButton(
-            icon: Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh),
             onPressed: () {
-              
+              _showDialog(
+                title: '更新提示',
+                message: '这是一个更新提示消息。',
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              _getversion();
             },
           ),
         ],

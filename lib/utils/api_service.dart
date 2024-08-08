@@ -26,7 +26,7 @@ class ApiService {
   }
 
   Future<Map<String, dynamic>> fetchData() async {
-    final url = Uri.parse('$baseUrl/data');
+    final url = Uri.parse('$baseUrl/talking_points/data');
     print(url);
     try {
       final response = await http.get(url).timeout(const Duration(seconds: 10));
@@ -50,7 +50,7 @@ class ApiService {
     String? month,
     String? name,
   }) async {
-    final uri = Uri.parse('$baseUrl/filter');
+    final uri = Uri.parse('$baseUrl/talking_points/filter');
     print(uri);
     
     // Build the request body
