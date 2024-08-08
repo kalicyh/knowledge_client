@@ -116,7 +116,7 @@ jobs:
         if: ${{ matrix.type == 'windows' }}
         uses: ncipollo/release-action@v1
         with:
-          tag: "v${{ env.version }}"
+          tag: "${{ env.version }}"
           draft: false
           artifacts: "*.zip"
           allowUpdates: true
@@ -126,7 +126,7 @@ jobs:
         if: ${{ matrix.type == 'android' }}
         uses: ncipollo/release-action@v1
         with:
-          tag: "v${{ env.version }}"
+          tag: "${{ env.version }}"
           draft: false
           artifacts: "build/app/outputs/flutter-apk/*.apk"
           allowUpdates: true
@@ -136,7 +136,7 @@ jobs:
         if: ${{ matrix.type == 'macos' }}
         uses: ncipollo/release-action@v1
         with:
-          tag: "v${{ env.version }}"
+          tag: "${{ env.version }}"
           draft: false
           artifacts: "*.dmg"
           allowUpdates: true
