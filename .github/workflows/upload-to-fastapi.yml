@@ -16,17 +16,26 @@ jobs:
         with:
           name: build-artifacts
 
+      - name: Get Latest Release Tag
+        id: get_latest_release
+        run: |
+          # 获取最新发布的版本信息
+          LATEST_RELEASE=$(curl -s https://api.github.com/repos/${{ github.repository }}/releases/latest)
+          LATEST_TAG=$(echo $LATEST_RELEASE | jq -r '.tag_name')
+          echo "LATEST_TAG=${LATEST_TAG}" >> $GITHUB_ENV
+
       - name: Upload Tag and Artifacts to FastAPI
         env:
           FASTAPI_URL: ${{ secrets.FASTAPI_URL }} # FastAPI 服务器的 URL
-          GITHUB_REF: ${{ github.event.workflow_run.head_ref }} # 获取触发 workflow 的 tag
+          TAG: ${{ env.LATEST_TAG }} # 最新的 release 标签
         run: |
           TAG="${GITHUB_REF#refs/tags/}"
           echo "Tag: $TAG"
 
           # 上传文件
           for file in $(find . -name '*.*'); do
-            curl -X POST "$FASTAPI_URL/upload-file/" \
-                 -F "tag=$TAG" \
+            curl -X POST "$FASTAPI_URL/upload-file/?tag=$TAG" \
+                 -H "accept: application/json" \
+                 -H "Content-Type: multipart/form-data" \
                  -F "file=@$file"
           done
