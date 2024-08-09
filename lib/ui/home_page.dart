@@ -13,7 +13,8 @@ class _HomePageState extends State<HomePage> {
   List<String> _categories = [];
   List<String> _months = [];
   List<String> _records = [];
-  String _versions = '';
+  String _clientversions = '';
+  String _backendversions = '';
   String _selectedCategory = '朋友圈';
   String _selectedMonth = '';
   String _selectedName = '';
@@ -78,14 +79,15 @@ class _HomePageState extends State<HomePage> {
    Future<void> _getversion() async {
     try {
       final infoData = await _apiService.fetchInfo();
-      final String versions = infoData['version'];
-      print(versions);
+      final String clientversions = infoData['client_versions'];
+      final String backendversions = infoData['backend_versions'];
       setState(() {
-        _versions = versions;
+        _clientversions = clientversions;
+        _backendversions = backendversions;
       });
       _showDialog(
         title: '关于',
-        message: '当前版本：1.5.0\n当前后端版本：$_versions',
+        message: '当前版本：$_clientversions\n当前后端版本：$_backendversions',
       );
     } catch (e) {
       _showDialog(

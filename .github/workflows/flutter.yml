@@ -141,3 +141,13 @@ jobs:
           artifacts: "*.dmg"
           allowUpdates: true
           token: ${{ secrets.TOKEN }}
+      
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: |
+            ${{ matrix.type == 'macos' && matrix.path }}/*.dmg
+            ${{ matrix.type == 'windows' && matrix.path }}/*.zip
+            ${{ matrix.type == 'android' && matrix.path }}/*.apk
+

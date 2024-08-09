@@ -1,0 +1,32 @@
+name: Upload to FastAPI
+
+on:
+  workflow_run:
+    workflows: ["Flutter 自动化打包"]
+    types:
+      - completed
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifacts
+
+      - name: Upload Tag and Artifacts to FastAPI
+        env:
+          FASTAPI_URL: ${{ secrets.FASTAPI_URL }} # FastAPI 服务器的 URL
+          GITHUB_REF: ${{ github.event.workflow_run.head_ref }} # 获取触发 workflow 的 tag
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          echo "Tag: $TAG"
+
+          # 上传文件
+          for file in $(find . -name '*.*'); do
+            curl -X POST "$FASTAPI_URL/upload-file/" \
+                 -F "tag=$TAG" \
+                 -F "file=@$file"
+          done
