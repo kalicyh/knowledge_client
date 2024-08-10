@@ -9,6 +9,7 @@ class FilterSidebar extends StatelessWidget {
   final Function(String) onCategoryChanged;
   final Function(String) onMonthChanged;
   final Function(String) onNameChanged;
+  final Function(String) onSearchChanged;
 
   FilterSidebar({
     required this.months,
@@ -19,6 +20,7 @@ class FilterSidebar extends StatelessWidget {
     required this.onCategoryChanged,
     required this.onMonthChanged,
     required this.onNameChanged,
+    required this.onSearchChanged,
   });
 
   @override
@@ -61,7 +63,7 @@ class FilterSidebar extends StatelessWidget {
                 labelText: '搜索',
               ),
               onChanged: (value) {
-                onNameChanged(value);
+                onSearchChanged(value);
               },
             ),
           ),

@@ -82,4 +82,40 @@ class ApiService {
       throw Exception('Failed to load categories: $e');
     }
   }
+
+  Future<Map<String, dynamic>> searchCategories({
+    String? name,
+  }) async {
+    final uri = Uri.parse('$baseUrl/talking_points/get-details-by-name');
+    print(uri);
+    
+    // Build the request body
+    final requestBody = jsonEncode({
+      'name': name,
+    });
+
+    try {
+      final response = await http.post(
+        uri,
+        headers: {
+          'Content-Type': 'application/json', // Set the content type to JSON
+        },
+        body: requestBody,
+      ).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        // Ensure the response is UTF-8 encoded
+        final decodedResponse = utf8.decode(response.bodyBytes);
+        return jsonDecode(decodedResponse) as Map<String, dynamic>;
+      } else {
+        throw Exception('获取分类失败: ${response.statusCode}');
+      }
+    } catch (e) {
+      // Print more detailed exception information
+      print('Error fetching categories: $e');
+      throw Exception('Failed to load categories: $e');
+    }
+  }
+
+
 }

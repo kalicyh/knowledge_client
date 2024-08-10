@@ -9,7 +9,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final ApiService _apiService = ApiService(baseUrl: 'https://zk.jiuyue1688.vip');
+  final ApiService _apiService = ApiService(baseUrl: 'http://127.0.0.1:8000');
   List<String> _categories = [];
   List<String> _months = [];
   List<String> _records = [];
@@ -18,6 +18,7 @@ class _HomePageState extends State<HomePage> {
   String _selectedCategory = '朋友圈';
   String _selectedMonth = '';
   String _selectedName = '';
+  String _search = '';
 
   @override
   void initState() {
@@ -71,6 +72,26 @@ class _HomePageState extends State<HomePage> {
           _records = records;
         });
       }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  Future<void> _searchFiltered() async {
+    try {
+      final response = await _apiService.searchCategories(
+        name: _search.isNotEmpty ? _search : "",
+      );
+
+      final data = response;
+
+      if (data.containsKey('names')) {
+        final List<String> categories = List<String>.from(data['names']);
+        setState(() {
+          _categories = categories;
+        });
+      }
+
     } catch (e) {
       print('Error: $e');
     }
@@ -168,6 +189,12 @@ class _HomePageState extends State<HomePage> {
                 _selectedName = name;
               });
               _loadFilteredRecords();
+            },
+            onSearchChanged: (name) {
+              setState(() {
+                _search = name;
+              });
+              _searchFiltered();
             },
           ),
           Expanded(
