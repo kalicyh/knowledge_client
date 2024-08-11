@@ -65,7 +65,7 @@ jobs:
       - name: 打印版本号
         run: |
           echo "version: ${{ env.version }}"
-      
+
       - name: Install CocoaPods
         if: ${{ matrix.type == 'macos' }}
         run: |
@@ -75,16 +75,16 @@ jobs:
 
       - name: 打包Macos
         if: ${{ matrix.type == 'macos' }}
-        run: flutter build macos
+        run: flutter build macos --build-name=${{ env.version }}
 
       - name: 打包Windows
         if: ${{ matrix.type == 'windows' }}
         shell: pwsh
-        run: flutter build windows
+        run: flutter build windows --build-name=${{ env.version }}
 
       - name: 打包安卓
         if: ${{ matrix.type == 'android' }}
-        run: flutter build apk
+        run: flutter build apk --build-name=${{ env.version }}
         env:
           KEYSTORE_KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
           KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
