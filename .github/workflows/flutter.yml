@@ -104,7 +104,7 @@ jobs:
             --window-size 800 400 \
             --app-drop-link 600 35 \
             ${{ github.event.repository.name }}-${{ matrix.type }}.dmg \
-            "${{ matrix.path }}/${{ github.event.repository.name }}.app"
+            "${{ matrix.path }}/knowledge_stock.app"
 
       - name: 压缩产物(windows)
         if: ${{ matrix.type == 'windows' }}

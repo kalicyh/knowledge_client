@@ -9,7 +9,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final ApiService _apiService = ApiService(baseUrl: 'http://127.0.0.1:8000');
+  final ApiService _apiService = ApiService(baseUrl: 'https://zk.jiuyue1688.vip');
   List<String> _categories = [];
   List<String> _months = [];
   List<String> _records = [];
